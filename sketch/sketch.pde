@@ -13,7 +13,7 @@ void setup(){
 	nodeIndex = 0;
 }
 
-
+Node select = null;
 
 void draw(){
 	background(50);
@@ -27,17 +27,11 @@ void draw(){
 	tree.drawBranches();
 
 
-	// Node n = tree.getNode(nodeIndex);
-
-	// strokeWeight(10);
-	// stroke(0, 255, 0);
-	// n.draw();
-
-	// stroke(255, 255, 0);
-	// strokeWeight(3);
-	// for(Branch b : n.PARENTS){
-	// 	b.draw();
-	// }
+	for(Node n : tree.getEnds()){
+		strokeWeight(6);
+		stroke(255, 200, 0);
+		n.draw();
+	}
 
 
 	// DISPLAY INFOS
@@ -56,6 +50,9 @@ void draw(){
 void keyPressed(){
 	if(keyCode == LEFT) nodeIndex = abs(--nodeIndex) % tree.NODES.size();
 	if(keyCode == RIGHT) nodeIndex = ++nodeIndex % tree.NODES.size();
+	if(key == 'n'){
+		select = tree.getRandomNode();
+	}
 	if(key == 'r') setup();
 	if(key == ' '){
 		Node n = new Node( Vec3D.randomVector().scale(300) );

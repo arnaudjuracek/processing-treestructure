@@ -45,7 +45,8 @@ public class Branch{
 	public Node getFirstNode(){ return this.START; }
 	public Node getLastNode(){ return this.END; }
 	public Node getRandomNode(){ return this.NODES.get(int(random(this.NODES.size()))); }
-
+	public Node getEnd(){ return this.END; }
+	public Node getStart(){ return this.START; }
 
 
 

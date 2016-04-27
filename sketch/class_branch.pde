@@ -33,7 +33,7 @@ public class Branch{
 	// add a new node to the branch list AND the branch's tree list
 	// return the new node
 	private Node registerNode(Node n){
-		if(!this.PARENT.NODES.contains(n)) this.PARENT.NODES.add(n);
+		if(!this.PARENT.NODES.contains(n)) this.PARENT.addNode(n);
 		if(!this.NODES.contains(n)) this.NODES.add(n);
 		return n;
 	}
@@ -56,7 +56,7 @@ public class Branch{
 	// 0 being the start of the branch, and 1 its end
 	// return the inserted node
 	public Node insertNode(float position){
-		Vec3D v = this.START.vector.interpolateTo(this.END.vector, position);
+		Vec3D v = this.START.getVector().interpolateTo(this.END.getVector(), position);
 		return this.registerNode(new Node(this, v));
 	}
 
@@ -66,12 +66,12 @@ public class Branch{
 	// MATHS & GEOM HELPERS
 	// return the length of the branch
 	public float length(){
-		return this.START.vector.distanceTo(this.END.vector);
+		return this.START.getVector().distanceTo(this.END.getVector());
 	}
 
-	// return the global direction of the branch as a normalized 3D vector
+	// return the global direction of the branch as a normalized 3D getVector()
 	public Vec3D heading(){
-		return this.END.vector.sub(this.START.vector).normalize();
+		return this.END.getVector().sub(this.START.getVector()).normalize();
 	}
 
 
@@ -79,6 +79,6 @@ public class Branch{
 	// -------------------------------------------------------------------------
 	// GUI
 	public void draw(){
-		line(this.START.vector.x, this.START.vector.y, this.START.vector.z, this.END.vector.x, this.END.vector.y, this.END.vector.z);
+		line(this.START.getVector().x, this.START.getVector().y, this.START.getVector().z, this.END.getVector().x, this.END.getVector().y, this.END.getVector().z);
 	}
 }

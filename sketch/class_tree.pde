@@ -1,8 +1,8 @@
 public class Tree{
 	private ArrayList<Branch> BRANCHES;
 	private ArrayList<Node> NODES;
-
-	public Node ROOT;
+	private Node ROOT;
+	private AABB AABB;
 
 	// -------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -11,11 +11,26 @@ public class Tree{
 		this.NODES = new ArrayList<Node>(); // must be instantiated before the first branch instantiation
 
 		this.ROOT = new Node(from);
+		this.AABB = new AABB();
 
 		this.BRANCHES = new ArrayList<Branch>();
 		this.BRANCHES.add(new Branch(this, ROOT, new Node(to)));
 	}
 
+
+
+	// -------------------------------------------------------------------------
+	// SETTERS
+	public Node addNode(Node n){
+		this.NODES.add(n);
+		if(this.AABB!=null) this.AABB.includePoint(n.getVector());
+		return n;
+	}
+
+	public Branch addBranch(Branch b){
+		this.BRANCHES.add(b);
+		return b;
+	}
 
 
 	// -------------------------------------------------------------------------
@@ -30,8 +45,8 @@ public class Tree{
 	public ArrayList<Branch> getConnectedBranches(Branch from){
 		ArrayList<Branch> nearest = new ArrayList<Branch>();
 		for(Node n : from.NODES){
-			if(n.PARENTS!=null){
-				for(Branch b : n.PARENTS){
+			if(n.getParents()!=null){
+				for(Branch b : n.getParents()){
 					if(!nearest.contains(b) && b!=from) nearest.add(b);
 				}
 			}
@@ -68,7 +83,7 @@ public class Tree{
 	public Node getNearestNode(Vec3D from){
 		Node nearest = null;
 		for(Node n : this.getNodes()){
-			if(nearest == null || from.distanceTo(n.vector) < from.distanceTo(nearest.vector)){
+			if(nearest == null || from.distanceTo(n.getVector()) < from.distanceTo(nearest.getVector())){
 				nearest = n;
 			}
 		}
@@ -78,11 +93,11 @@ public class Tree{
 	// return the nearest connected node to another one
 	public Node getNearestNeighborNode(Node from){
 		Node neighbor = null;
-		if(from.PARENTS!=null){
+		if(from.getParents()!=null){
 			ArrayList<Node> possibleNodes = new ArrayList<Node>();
-			for(Branch b : from.PARENTS) for(Node n : b.NODES) possibleNodes.add(n);
+			for(Branch b : from.getParents()) for(Node n : b.NODES) possibleNodes.add(n);
 			for(Node n : possibleNodes){
-				if(neighbor == null || from.vector.distanceTo(n.vector) < from.vector.distanceTo(neighbor.vector)){
+				if(neighbor == null || from.getVector().distanceTo(n.getVector()) < from.getVector().distanceTo(neighbor.getVector())){
 					if(n!=from) neighbor = n;
 				}
 			}
@@ -93,13 +108,13 @@ public class Tree{
 	// return the n nearest connected nodes to another one
 	public ArrayList<Node> getNearestNeighborNodes(Node from, int n_neighbors){
 		ArrayList<Node> neighbors = new ArrayList<Node>();
-		if(from.PARENTS!=null){
+		if(from.getParents()!=null){
 			ArrayList<Node> possibleNodes = new ArrayList<Node>();
-			for(Branch b : from.PARENTS) for(Node n : b.NODES) possibleNodes.add(n);
+			for(Branch b : from.getParents()) for(Node n : b.NODES) possibleNodes.add(n);
 			for(int i=0; i<n_neighbors; i++){
 				Node neighbor = null;
 				for(Node n : possibleNodes){
-					if(neighbor == null || from.vector.distanceTo(n.vector) < from.vector.distanceTo(neighbor.vector)){
+					if(neighbor == null || from.getVector().distanceTo(n.getVector()) < from.getVector().distanceTo(neighbor.getVector())){
 						if(n!=from && !neighbors.contains(n)) neighbor = n;
 					}
 				}
@@ -113,12 +128,12 @@ public class Tree{
 
 
 	// ---------------------------------------------------------------------------
-	// SETTERS
+	// INSERTIONS
 	// add a new branch to the Tree from a node to another
 	// return the new branch
-	public Branch addBranch(Node from, Node to){
+	public Branch insertBranch(Node from, Node to){
 		Branch b = new Branch(this, from, to);
-		this.BRANCHES.add(b);
+		this.addBranch(b);
 		return b;
 	}
 
@@ -140,11 +155,18 @@ public class Tree{
 		return average.normalize();
 	}
 
-	// return the centroid of the as a 3D vector
-	// public Vec3D centroid(){}
-
 	// return the bounding box of the tree as a Axis Align Bounding Box
-	// public AABB boundingbox(){}
+	public AABB getAABB(){
+		// AABB box = new AABB();
+		// for(Node n : this.getNodes()) box.includePoint(n.getVector());
+		return this.AABB; // the AABB is updated in Tree.addNode()
+	}
+
+	// return the centroid of the as a 3D vector
+	public Vec3D getCentroid(){
+		AABB box = this.getAABB();
+		return box.getMin().interpolateTo(box.getMax(), .5);
+	}
 
 
 	// -------------------------------------------------------------------------

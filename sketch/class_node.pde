@@ -1,6 +1,6 @@
 public class Node{
-	public ArrayList<Branch> PARENTS;
-	public Vec3D vector;
+	private ArrayList<Branch> PARENTS;
+	private Vec3D vector;
 
 	// -------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -29,6 +29,13 @@ public class Node{
 			return true;
 		}else return false;
 	}
+
+
+
+	// -------------------------------------------------------------------------
+	// GETTERS
+	public ArrayList<Branch> getParents(){ return this.PARENTS; }
+	public Vec3D getVector(){ return this.vector; }
 
 
 

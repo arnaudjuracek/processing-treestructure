@@ -1,14 +1,18 @@
-import peasy.*;
 import toxi.geom.*;
+
+// optional
+import peasy.*;
+import toxi.processing.*;
 
 Tree tree;
 PeasyCam cam;
-
+ToxiclibsSupport gfx;
 int nodeIndex = 0;
 
 void setup(){
 	size(800, 800, OPENGL);
 	cam = new PeasyCam(this, 1000);
+	gfx = new ToxiclibsSupport(this);
 	tree = new Tree(new Vec3D(0,0,0), new Vec3D(100,0,0));
 	nodeIndex = 0;
 }
@@ -33,6 +37,24 @@ void draw(){
 		n.draw();
 	}
 
+	noFill();
+	strokeWeight(1);
+	stroke(255, 10);
+	gfx.mesh(tree.getAABB().toMesh());
+
+	strokeWeight(10);
+	stroke(255, 0, 255);
+	Vec3D c = tree.getCentroid();
+	point(c.x, c.y, c.z);
+
+	Node centroid = tree.getNearestNode(c);
+	stroke(0, 255, 255);
+	centroid.draw();
+
+	for(Branch b : centroid.getParents()){
+		strokeWeight(2);
+		b.draw();
+	}
 
 	// DISPLAY INFOS
 	cam.beginHUD();
@@ -57,7 +79,7 @@ void keyPressed(){
 	if(key == ' '){
 		Node n = new Node( Vec3D.randomVector().scale(300) );
 		// Node n = new Node( tree.heading().scale(random(100)).jitter(10) );
-		Branch b = tree.addBranch(tree.getRandomNode(), n);
+		Branch b = tree.insertBranch(tree.getRandomNode(), n);
 		for(int i=0; i<random(10); i++) b.insertNode(random(.25, .75));
 	}
 	if(key == 'i'){
@@ -66,6 +88,6 @@ void keyPressed(){
 	}
 	if(key == 'b'){
 		Node n = new Node( Vec3D.randomVector().scale(300) );
-		tree.addBranch(tree.getRandomNode(), n);
+		tree.insertBranch(tree.getRandomNode(), n);
 	}
 }

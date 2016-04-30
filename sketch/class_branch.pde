@@ -1,7 +1,8 @@
 public class Branch{
 	private Tree PARENT;
-	private Node START, END;
+	private Node ROOT, LEAF;
 	private ArrayList<Node> NODES;
+	private int DEPTH;
 
 	// -------------------------------------------------------------------------
 	// CONSTRUCTOR
@@ -10,8 +11,8 @@ public class Branch{
 		this.PARENT = t;
 		this.NODES = new ArrayList<Node>();
 
-		this.START = this.registerNode(from);
-		this.END = this.registerNode(to);
+		this.ROOT = this.registerNode(from.registerAsRoot(this));
+		this.LEAF = this.registerNode(to.registerAsLeaf(this));
 
 		this.registerAsParent();
 	}
@@ -39,14 +40,30 @@ public class Branch{
 	}
 
 
+
+	// -------------------------------------------------------------------------
+	// DATA
+	// compute how deep this branch is on the tree
+	// return the depth level as an int
+	public int getDepth(){ return this.DEPTH; }
+
+	// set the depth level of the branch
+	// return the branch
+	public Branch setDepth(int level){
+		this.DEPTH = level;
+		return this;
+	}
+
+
 	// -------------------------------------------------------------------------
 	// GETTERS
+	public ArrayList<Node> getNodes(){ return this.NODES; }
 	public Node getNode(int index){ return this.NODES.get(index); }
-	public Node getFirstNode(){ return this.START; }
-	public Node getLastNode(){ return this.END; }
+	public Node getFirstNode(){ return this.ROOT; }
+	public Node getLastNode(){ return this.LEAF; }
 	public Node getRandomNode(){ return this.NODES.get(int(random(this.NODES.size()))); }
-	public Node getEnd(){ return this.END; }
-	public Node getStart(){ return this.START; }
+	public Node getLeaf(){ return this.LEAF; }
+	public Node getRoot(){ return this.ROOT; }
 
 
 
@@ -56,7 +73,7 @@ public class Branch{
 	// 0 being the start of the branch, and 1 its end
 	// return the inserted node
 	public Node insertNode(float position){
-		Vec3D v = this.START.getVector().interpolateTo(this.END.getVector(), position);
+		Vec3D v = this.ROOT.getVector().interpolateTo(this.LEAF.getVector(), position);
 		return this.registerNode(new Node(this, v));
 	}
 
@@ -66,12 +83,12 @@ public class Branch{
 	// MATHS & GEOM HELPERS
 	// return the length of the branch
 	public float length(){
-		return this.START.getVector().distanceTo(this.END.getVector());
+		return this.ROOT.getVector().distanceTo(this.LEAF.getVector());
 	}
 
 	// return the global direction of the branch as a normalized 3D getVector()
 	public Vec3D heading(){
-		return this.END.getVector().sub(this.START.getVector()).normalize();
+		return this.LEAF.getVector().sub(this.ROOT.getVector()).normalize();
 	}
 
 
@@ -79,6 +96,6 @@ public class Branch{
 	// -------------------------------------------------------------------------
 	// GUI
 	public void draw(){
-		line(this.START.getVector().x, this.START.getVector().y, this.START.getVector().z, this.END.getVector().x, this.END.getVector().y, this.END.getVector().z);
+		line(this.ROOT.getVector().x, this.ROOT.getVector().y, this.ROOT.getVector().z, this.LEAF.getVector().x, this.LEAF.getVector().y, this.LEAF.getVector().z);
 	}
 }

@@ -2,6 +2,7 @@ public class Tree{
 	private ArrayList<Branch> BRANCHES;
 	private ArrayList<Node> NODES;
 	private Node ROOT;
+	private int DEPTH;
 	private AABB AABB;
 
 	// -------------------------------------------------------------------------
@@ -14,7 +15,9 @@ public class Tree{
 		this.AABB = new AABB();
 
 		this.BRANCHES = new ArrayList<Branch>();
-		this.BRANCHES.add(new Branch(this, ROOT, new Node(to)));
+		this.BRANCHES.add(new Branch(this, ROOT, new Node(to)).setDepth(1));
+
+		this.DEPTH = 1;
 	}
 
 
@@ -66,14 +69,14 @@ public class Tree{
 	public Node getRoot(){ return this.ROOT; }
 
 	// return the end nodes of the tree as an array of nodes
-	public ArrayList<Node> getEnds(){
+	public ArrayList<Node> getLeaves(){
 		ArrayList<Node> bstarts = new ArrayList<Node>();
-		for(Branch b : this.getBranches()) bstarts.add(b.getStart());
+		for(Branch b : this.getBranches()) bstarts.add(b.getRoot());
 
 		ArrayList<Node> ends = new ArrayList<Node>();
 		for(Branch b : this.getBranches()){
-			Node end = b.getEnd();
-			if(!bstarts.contains(end)) ends.add(b.getEnd());
+			Node end = b.getLeaf();
+			if(!bstarts.contains(end)) ends.add(b.getLeaf());
 		}
 		return ends;
 	}
@@ -130,9 +133,13 @@ public class Tree{
 	// ---------------------------------------------------------------------------
 	// INSERTIONS
 	// add a new branch to the Tree from a node to another
+	// update the tree.depth is needed, but set the depth of the branch anyway
 	// return the new branch
 	public Branch insertBranch(Node from, Node to){
+		if(from.LEAF_OF != null && from.LEAF_OF.getDepth() >= this.DEPTH) this.DEPTH++;
+
 		Branch b = new Branch(this, from, to);
+		b.setDepth(this.DEPTH);
 		this.addBranch(b);
 		return b;
 	}
@@ -147,6 +154,12 @@ public class Tree{
 
 
 	// -------------------------------------------------------------------------
+	// DATA
+
+	public int getDepth(){ return this.DEPTH; }
+
+
+	// -------------------------------------------------------------------------
 	// MATHS & GEOM HELPERS
 	// return the average direction of the tree's branches as a normalized 3D vector
 	public Vec3D heading(){
@@ -157,8 +170,6 @@ public class Tree{
 
 	// return the bounding box of the tree as a Axis Align Bounding Box
 	public AABB getAABB(){
-		// AABB box = new AABB();
-		// for(Node n : this.getNodes()) box.includePoint(n.getVector());
 		return this.AABB; // the AABB is updated in Tree.addNode()
 	}
 
